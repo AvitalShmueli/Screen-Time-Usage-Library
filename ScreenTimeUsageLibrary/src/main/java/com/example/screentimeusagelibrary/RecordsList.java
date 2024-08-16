@@ -1,7 +1,5 @@
 package com.example.screentimeusagelibrary;
 
-import android.util.Log;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,9 +83,7 @@ public class RecordsList {
     private String getTodayDateFormatted(){
         Date todayDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        String today = dateFormat.format(todayDate);
-        Log.d("TEST TIME RecordsList", today);
-        return  today;
+        return dateFormat.format(todayDate);
     }
 
 

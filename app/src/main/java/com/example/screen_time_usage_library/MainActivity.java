@@ -18,7 +18,7 @@ public class MainActivity extends MonitoredActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        int minutes = 2;
+        int minutes = 5;
         setTimeLimit_minutes(minutes);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -27,29 +27,28 @@ public class MainActivity extends MonitoredActivity {
         button.setOnClickListener(v -> Toast.makeText(this,"This is a toast!",Toast.LENGTH_SHORT).show());
 
         float lastUseTimestamp = getScreenTimeUsage().getDailyUsage();
-        String str = "HELLO\n"+df.format(lastUseTimestamp)+" min";
+        String str = "HELLO\n Daily usage: "+df.format(lastUseTimestamp)+" min";
         main_LBL_last_time.setText(str);
 
         getScreenTimeUsage().setDialogTimeLimitTitle("Your time is up!!").
                 setDialogTimeLimitBody("Your time up.\nPlease try again later.")
                 .setTimeLimit(minutes*60*1000)
-                .setExtraTime(2*60*1000); // half an hour
+                .setExtraTime(2*60*1000);
 
         getScreenTimeUsage().setTimeLimitCallback(new TimeLimitCallback() {
             @Override
-            public void onTimeEnds()  {
-                String strTimeEnds = "TIME ENDS! "+df.format(lastUseTimestamp)+"\nPlease come back tomorrow.";
+            public void onTimeEnds(float usageMinutes)  {
+                String strTimeEnds = "TIME ENDS! "+df.format(usageMinutes)+"\nPlease come back tomorrow.";
                 main_LBL_last_time.setText(strTimeEnds);
                 button.setEnabled(false);
             }
 
             @Override
             public void onUsageTimeUpdated(float usageMinutes) {
-                String str = "updated\n"+df.format(usageMinutes)+" min";
+                String str = "updated usage\n"+df.format(usageMinutes)+" min";
                 main_LBL_last_time.setText(str);
             }
         });
-
 
         Log.d("TEST - daily","daily " + getScreenTimeUsage().getDailyUsage());
         Log.d("TEST - weekly","weekly " + getScreenTimeUsage().getWeeklyUsage());

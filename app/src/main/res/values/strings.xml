@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Screen-Time-Usage-Library</string>
+    <string name="button_text">Click</string>
 </resources>
