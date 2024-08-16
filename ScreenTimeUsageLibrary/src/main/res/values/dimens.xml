@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_default">16dp</dimen>
+    <dimen name="data_elevation">5dp</dimen>
+    <dimen name="data_corner_radius">35dp</dimen>
+    <dimen name="data_margin_vertical">5dp</dimen>
+    <dimen name="text_size_header">20sp</dimen>
+    <dimen name="text_size_body">16sp</dimen>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/dialog_IMG_header"
+        android:src="@drawable/ic_icon_gradient_background"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:scaleType="center"
+        android:background="#FFFFBB33"
+        android:contentDescription="@string/app_name" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_LBL_title"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="Your time is up!"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_header"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_LBL_body"
+        android:layout_width="match_parent"
+        android:layout_marginVertical="@dimen/margin_default"
+        android:layout_marginHorizontal="@dimen/margin_default"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_LBL_title"
+        android:text="Your time is up!"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_body"
+        android:textColor="@color/black"
+        android:textStyle="normal"/>
+
+
+<!--    <com.google.android.material.textfield.TextInputEditText-->
+<!--        android:id="@+id/dialog_TXT_name"-->
+<!--        android:inputType="text"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginLeft="4dp"-->
+<!--        android:layout_marginRight="4dp"-->
+<!--        android:layout_marginBottom="4dp"-->
+<!--        android:hint="Your name"-->
+<!--        android:layout_below="@id/dialog_IMG_header"/>-->
+
+</RelativeLayout>
