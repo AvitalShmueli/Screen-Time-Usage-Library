@@ -1,8 +1,7 @@
 
 # Screen-Time-Usage-Library
 
-Final project for Mobile Security course, in Afeka - the academic college  
-of Engineering in Tel Aviv.
+Final project for Mobile Security course, in Afeka - the academic college of Engineering in Tel Aviv.
 
 ## Overview
 
