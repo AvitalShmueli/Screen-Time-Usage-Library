@@ -2,18 +2,18 @@ package com.example.screen_time_usage_library;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.screentimeusagelibrary.MonitoredActivity;
 import com.example.screentimeusagelibrary.TimeLimitCallback;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.text.DecimalFormat;
 
 public class MainActivity extends MonitoredActivity {
-    private Button button;
-    private TextView main_LBL_last_time;
+    private MaterialButton button;
+    private MaterialTextView main_LBL_last_time;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Override
@@ -26,16 +26,21 @@ public class MainActivity extends MonitoredActivity {
         findViews();
         button.setOnClickListener(v -> Toast.makeText(this,"This is a toast!",Toast.LENGTH_SHORT).show());
 
+        float lastUseTimestamp = getScreenTimeUsage().getDailyUsage();
+        String str = "HELLO\n"+df.format(lastUseTimestamp)+" min";
+        main_LBL_last_time.setText(str);
+
         getScreenTimeUsage().setDialogTimeLimitTitle("Your time is up!!").
                 setDialogTimeLimitBody("Your time up.\nPlease try again later.")
                 .setTimeLimit(minutes*60*1000)
-                .setExtraTime(1*60*1000); // half an hour
+                .setExtraTime(2*60*1000); // half an hour
 
         getScreenTimeUsage().setTimeLimitCallback(new TimeLimitCallback() {
             @Override
             public void onTimeEnds()  {
-                String strTimeEnds = "TIME ENDS!\nPlease come back tomorrow.";
+                String strTimeEnds = "TIME ENDS! "+df.format(lastUseTimestamp)+"\nPlease come back tomorrow.";
                 main_LBL_last_time.setText(strTimeEnds);
+                button.setEnabled(false);
             }
 
             @Override
@@ -45,9 +50,6 @@ public class MainActivity extends MonitoredActivity {
             }
         });
 
-        float lastUseTimestamp = getScreenTimeUsage().getDailyUsage();
-        String str = "HELLO\n"+df.format(lastUseTimestamp)+" min";
-        main_LBL_last_time.setText(str);
 
         Log.d("TEST - daily","daily " + getScreenTimeUsage().getDailyUsage());
         Log.d("TEST - weekly","weekly " + getScreenTimeUsage().getWeeklyUsage());
