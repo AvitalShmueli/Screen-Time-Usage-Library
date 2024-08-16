@@ -30,12 +30,12 @@ public class MonitoredActivity extends AppCompatActivity {
     }
 
 
-    public void setTimeLimit_minutes(float timeLimit_minutes) {
+    public void setTimeLimit(float timeLimit_minutes) {
         this.timeLimit_minutes = timeLimit_minutes;
     }
 
 
-    public void setTimeout_minutes(float timeout_minutes) {
+    public void setTimeout(float timeout_minutes) {
         this.timeout_minutes = timeout_minutes;
     }
 

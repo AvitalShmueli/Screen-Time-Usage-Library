@@ -10,3 +10,55 @@ A library for monitoring application usage time. Daily usage times are saved as 
 With the library's help, it will be possible to identify user inactivity (for example, that the application is open without interaction from the user) 
 or overuse and limit time. In addition, there is a dialog that allows you to extend the usage time by X minutes or dismiss the app and lock other actions with a customized callback.
 
+## Usage
+#### ScreenTimeUsageLibrary Constructor:
+The activity should extend MonitoredActivity. 
+In OnCreate() you can modify the parameters of the ScreenTimeUsage. 
+In order to change the time limit and the timeout interval you need to use the following functions before calling the super.onCreate(savedInstanceState)
+```java
+setTimeLimit_minutes(timeLimit_minutes);
+setTimeout_minutes(timeout_minutes);
+```
+
+#### Methods & Other attributes
+In order to adjust the parameters of ScreenTimeUsage, first call to getScreenTimeUsage().
+You can adjust the texts in the title, body and buttons of the alert dialog using the following functions:
+```java
+setDialogTimeLimitTitle(String title)
+setDialogTimeLimitBody(String body)
+setDialogTimeLimitButtonNameDismiss(String btnName)
+setDialogTimeLimitButtonNameMoreTime(String btnName)
+
+setDialogTimeoutTitle(String title)
+setDialogTimeoutBody(String body)
+setDialogTimeoutButtonNameDismiss(String btnName)
+setDialogTimeoutButtonNameMoreTime(String btnName)
+
+setExtraTime(long milliseconds)
+```
+
+You can set the setTimeLimitCallback callback in order to define the actions that will occur when time ends.
+```java
+getScreenTimeUsage().setTimeLimitCallback(new TimeLimitCallback() {
+            @Override
+            public void onTimeEnds(long milliseconds)  {
+                String strTimeEnds = "TIME ENDS! "+formatTime(milliseconds)+"\nPlease come back tomorrow.";
+                main_LBL_last_time.setText(strTimeEnds);
+                button.setEnabled(false);
+                editTextText.setEnabled(false);
+            }
+
+            @Override
+            public void onUsageTimeUpdated(long milliseconds) {
+                String str = "updated usage - tap to refresh\n" + formatTime(milliseconds);
+                main_LBL_last_time.setText(str);
+            }
+        });
+```
+
+You can get aggregation of the usage records daily, weekly or monthly.
+```java
+getScreenTimeUsage().getDailyUsage()
+getScreenTimeUsage().getWeeklyUsage()
+getScreenTimeUsage().getMonthlyUsage()
+```

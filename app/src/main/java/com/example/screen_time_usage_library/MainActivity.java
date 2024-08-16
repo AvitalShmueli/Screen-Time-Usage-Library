@@ -22,7 +22,7 @@ public class MainActivity extends MonitoredActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         int minutes = 3;
-        setTimeLimit_minutes(minutes);
+        setTimeLimit(minutes);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
