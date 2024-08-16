@@ -10,6 +10,14 @@ A library for monitoring application usage time. Daily usage times are saved as 
 With the library's help, it will be possible to identify user inactivity (for example, that the application is open without interaction from the user) 
 or overuse and limit time. In addition, there is a dialog that allows you to extend the usage time by X minutes or dismiss the app and lock other actions with a customized callback.
 
+<div class="row">
+    <img src="https://github.com/user-attachments/assets/8ef6a65a-61d7-44a0-90eb-ed4a27a3691d" alt="time_limit" style="height:500px;"/>
+    <img src="https://github.com/user-attachments/assets/ea248006-3c54-4c61-8073-4bff99d39970" alt="usage_time_update" style="height:500px;"/>
+    <img src="https://github.com/user-attachments/assets/d476a1d0-2352-4adf-9435-a5c2700dd316" alt="timeout" style="height:500px;"/>
+    <img src="https://github.com/user-attachments/assets/c499b251-8ee7-46d5-a4a2-daef83d847d5" alt="after_dismiss" style="height:500px;"/>
+ </div>
+
+
 ## Usage
 #### ScreenTimeUsageLibrary Constructor:
 The activity should extend MonitoredActivity. 
