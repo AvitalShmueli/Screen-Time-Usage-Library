@@ -19,15 +19,29 @@
             android:text="Hello World!"
             android:textAlignment="center"
             android:gravity="center"
-            android:layout_gravity="center"/>
+            android:lineHeight="30dp"
+            android:layout_gravity="center"
+            android:textSize="@dimen/text_size"/>
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/editTextText"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:ems="10"
+            android:layout_gravity="center"
+            android:inputType="text"
+            android:hint="Type your text here" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_text"
             android:layout_gravity="center"
-            android:layout_marginTop="32dp"/>
+            android:layout_marginTop="32dp"
+            android:text="@string/button_text" />
+
+
 
     </LinearLayout>
 

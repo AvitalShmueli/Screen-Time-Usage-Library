@@ -1,6 +1,6 @@
 package com.example.screentimeusagelibrary;
 
 public interface TimeLimitCallback {
-    void onTimeEnds(float usageMinutes);
-    void onUsageTimeUpdated(float usageMinutes);
+    void onTimeEnds(long milliseconds);
+    void onUsageTimeUpdated(long milliseconds);
 }

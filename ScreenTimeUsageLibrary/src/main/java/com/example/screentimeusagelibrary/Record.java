@@ -2,7 +2,7 @@ package com.example.screentimeusagelibrary;
 
 public class Record {
     private String date;
-    private float usageMinutes;
+    private long usageMilliseconds;
 
     public Record() {
     }
@@ -19,20 +19,20 @@ public class Record {
     }
 
 
-    public Record setUsageMinutes(float usageMinutes) {
-        this.usageMinutes = usageMinutes;
+    public Record setUsageMilliseconds(long usageMilliseconds) {
+        this.usageMilliseconds = usageMilliseconds;
         return this;
     }
 
 
-    public Record addMinutes(float min){
-        this.usageMinutes += min;
+    public Record addMillseconds(long milliseconds){
+        this.usageMilliseconds += milliseconds;
         return this;
     }
 
 
-    public float getUsageMinutes() {
-        return usageMinutes;
+    public long getUsageMilliseconds() {
+        return usageMilliseconds;
     }
 
 
@@ -45,7 +45,7 @@ public class Record {
     public String toString() {
         return "Record{" +
                 "date='" + date + '\'' +
-                ", usageMinutes=" + usageMinutes +
+                ", usageMilliseconds=" + usageMilliseconds +
                 '}';
     }
 }

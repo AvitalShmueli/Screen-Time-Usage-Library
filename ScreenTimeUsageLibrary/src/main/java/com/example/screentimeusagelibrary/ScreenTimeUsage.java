@@ -32,7 +32,7 @@ public class ScreenTimeUsage {
     private MaterialTextView dialog_LBL_body;
     private String dialogTimeLimitBtnDismiss, dialogTimeLimitBtnMoreTime, dialogTimeLimitTitle, dialogTimeLimitBody;
     private String dialogTimeoutBtnDismiss, dialogTimeoutBtnMoreTime, dialogTimeoutTitle, dialogTimeoutBody;
-    private float totalMinutes;
+    private long totalMilliseconds;
     private final String today;
     private RecordsList records;
     private Record todayRecord;
@@ -87,9 +87,9 @@ public class ScreenTimeUsage {
         else{
             todayRecord = records.getTodayRecord();
             if(todayRecord != null){
-                totalMinutes = todayRecord.getUsageMinutes();
+                totalMilliseconds = todayRecord.getUsageMilliseconds();
             }
-            else totalMinutes = 0;
+            else totalMilliseconds = 0;
         }
         Log.d("TEST RECORDS_TABLE from SP", records.toString());
     }
@@ -112,11 +112,11 @@ public class ScreenTimeUsage {
         dialogTimeoutBtnDismiss = "Exit";
         dialogTimeoutBtnMoreTime = "Yes";
 
-        if (totalMinutes * 60 * 1000 >= timeLimit && !isDialogVisible)
+        if (totalMilliseconds >= timeLimit && !isDialogVisible)
             showTimeLimitDialog(dialogView);
 
         else{
-            timeLimit -= (long) (totalMinutes * 60 * 1000);
+            timeLimit -= totalMilliseconds;
             Log.d("TEST", "Remain time (ms): " + timeLimit);
         }
 
@@ -125,99 +125,103 @@ public class ScreenTimeUsage {
         startHandlerTimeLimit();
 
         mHandlerTimeout = new Handler(Looper.getMainLooper());
-        mRunnableTimeout = () -> showTimeoutDialog(view);
+        mRunnableTimeout = () -> {showTimeoutDialog(view);};
         startHandlerTimeout();
 
     }
 
 
-    private void showTimeLimitDialog(View view){
-        if (isDialogVisible) {
-            stopHandlerTimeLimit();
-            startHandlerTimeLimit();
-            return;
-        }
+    private void showTimeLimitDialog(View view) {
+        if (!isDismissOrExitPressed) {
+            if (isDialogVisible) {
+                stopHandlerTimeLimit();
+                startHandlerTimeLimit();
+                return;
+            }
 
-        if (view.getParent() != null)
-            ((ViewGroup) view.getParent()).removeView(view);
+            if (view.getParent() != null)
+                ((ViewGroup) view.getParent()).removeView(view);
 
-        dialog_LBL_title.setText(dialogTimeLimitTitle);
-        dialog_LBL_body.setText(dialogTimeLimitBody);
-        AlertDialog alertDialog = new MaterialAlertDialogBuilder(context).setView(view)
-                .setPositiveButton(dialogTimeLimitBtnMoreTime, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        stopHandlerTimeLimit();
-                        Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnMoreTime + "remain time (ms): " + timeLimit);
-                        updateUsageMinutes();
-                        if (timeLimitCallback != null) {
-                            timeLimitCallback.onUsageTimeUpdated(totalMinutes);
+            dialog_LBL_title.setText(dialogTimeLimitTitle);
+            dialog_LBL_body.setText(dialogTimeLimitBody);
+            AlertDialog alertDialog = new MaterialAlertDialogBuilder(context).setView(view)
+                    .setPositiveButton(dialogTimeLimitBtnMoreTime, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            stopHandlerTimeLimit();
+                            Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnMoreTime + "remain time (ms): " + timeLimit);
+                            updateUsageMinutes();
+                            if (timeLimitCallback != null) {
+                                timeLimitCallback.onUsageTimeUpdated(totalMilliseconds);
+                            }
+                            timeLimit = extraTime; // now the interval will be the extra time
+                            startHandlerTimeLimit();
+                            dialog.dismiss();
                         }
-                        timeLimit = extraTime; // now the interval will be the extra time
-                        startHandlerTimeLimit();
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton(dialogTimeLimitBtnDismiss, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        stopHandlerTimeLimit();
-                        stopHandlerTimeout();
-                        Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnDismiss);
-                        updateUsageMinutes();
-                        if(timeLimitCallback != null)
-                            timeLimitCallback.onTimeEnds(totalMinutes);
-                        isDismissOrExitPressed = true;
-                        dialog.dismiss();
-                    }
-                }).create();
-        alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
-        alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
-        alertDialog.show();
+                    }).setNegativeButton(dialogTimeLimitBtnDismiss, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            stopHandlerTimeLimit();
+                            stopHandlerTimeout();
+                            Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnDismiss);
+                            updateUsageMinutes();
+                            if (timeLimitCallback != null)
+                                timeLimitCallback.onTimeEnds(totalMilliseconds);
+                            isDismissOrExitPressed = true;
+                            dialog.dismiss();
+                        }
+                    }).create();
+            alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
+            alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
+            alertDialog.show();
+        }
     }
 
 
-    private void showTimeoutDialog(View view){
-        if (isDialogVisible) {
-            stopHandlerTimeout();
-            startHandlerTimeout();
-            return;
-        }
+    private void showTimeoutDialog(View view) {
+        if (!isDismissOrExitPressed) {
+            if (isDialogVisible) {
+                stopHandlerTimeout();
+                startHandlerTimeout();
+                return;
+            }
 
-        if (view.getParent() != null)
-            ((ViewGroup) view.getParent()).removeView(view);
+            if (view.getParent() != null)
+                ((ViewGroup) view.getParent()).removeView(view);
 
-        dialog_LBL_title.setText(dialogTimeoutTitle);
-        dialog_LBL_body.setText(dialogTimeoutBody);
-        AlertDialog alertDialog = new MaterialAlertDialogBuilder(context).setView(view)
-                .setPositiveButton(dialogTimeoutBtnMoreTime, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        stopHandlerTimeout();
-                        Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnMoreTime + "remain time (ms): " + timeLimit);
-                        updateUsageMinutes();
-                        if (timeLimitCallback != null) {
-                            timeLimitCallback.onUsageTimeUpdated(totalMinutes);
+            dialog_LBL_title.setText(dialogTimeoutTitle);
+            dialog_LBL_body.setText(dialogTimeoutBody);
+            AlertDialog alertDialog = new MaterialAlertDialogBuilder(context).setView(view)
+                    .setPositiveButton(dialogTimeoutBtnMoreTime, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            stopHandlerTimeout();
+                            Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnMoreTime + "remain time (ms): " + timeLimit);
+                            updateUsageMinutes();
+                            if (timeLimitCallback != null) {
+                                timeLimitCallback.onUsageTimeUpdated(totalMilliseconds);
+                            }
+                            startHandlerTimeout();
+                            dialog.dismiss();
                         }
-                        startHandlerTimeout();
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton(dialogTimeoutBtnDismiss, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        stopHandlerTimeout();
-                        stopHandlerTimeLimit();
-                        Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnDismiss);
-                        updateUsageMinutes();
-                        if(timeLimitCallback != null)
-                            timeLimitCallback.onTimeEnds(totalMinutes);
-                        isDismissOrExitPressed = true;
-                        dialog.dismiss();
-                    }
-                }).create();
+                    }).setNegativeButton(dialogTimeoutBtnDismiss, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            stopHandlerTimeout();
+                            stopHandlerTimeLimit();
+                            Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnDismiss);
+                            updateUsageMinutes();
+                            if (timeLimitCallback != null)
+                                timeLimitCallback.onTimeEnds(totalMilliseconds);
+                            isDismissOrExitPressed = true;
+                            dialog.dismiss();
+                        }
+                    }).create();
 
-        alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
-        alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
-        alertDialog.show();
+            alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
+            alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
+            alertDialog.show();
+        }
     }
 
 
@@ -329,17 +333,16 @@ public class ScreenTimeUsage {
     public void updateUsageMinutes(){
         long currentTimestamp = System.currentTimeMillis();
         long delta = currentTimestamp - initialTimestampMillis;
-        float deltaMin = (float) delta /(60 * 1000);
         initialTimestampMillis = currentTimestamp;
         if(todayRecord == null){
-            todayRecord = new Record().setDate(today).setUsageMinutes(deltaMin);
+            todayRecord = new Record().setDate(today).setUsageMilliseconds(delta);
             records.add(todayRecord);
         } else {
-            records.get(records.getIndexOfToday()).addMinutes(deltaMin);
+            records.get(records.getIndexOfToday()).addMillseconds(delta);
         }
-        totalMinutes += deltaMin;
+        totalMilliseconds += delta;
         if (timeLimitCallback != null) {
-            timeLimitCallback.onUsageTimeUpdated(totalMinutes);
+            timeLimitCallback.onUsageTimeUpdated(totalMilliseconds);
         }
         Gson gson = new Gson();
         String recordsListAsJson = gson.toJson(records);
@@ -348,27 +351,27 @@ public class ScreenTimeUsage {
     }
 
 
-    public float getDailyUsage(){
+    public long getDailyUsage(){
         if(todayRecord == null)
             return 0;
-        return todayRecord.getUsageMinutes();
+        return todayRecord.getUsageMilliseconds();
     }
 
 
-    public float getWeeklyUsage(){
-        return  getUsageForPeriod(7);
+    public long getWeeklyUsage(){
+        return getUsageForPeriod(7);
     }
 
 
-    public float getMonthlyUsage(){
+    public long getMonthlyUsage(){
         return getUsageForPeriod(30);
     }
 
 
-    private float getUsageForPeriod(int days) {
+    private long getUsageForPeriod(int days) {
         if (records == null || records.getRecordsArrayList() == null) return 0;
 
-        float totalUsageForPeriod = 0;
+        long totalUsageForPeriod = 0;
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_YEAR, -days);
         Date cutoffDate = calendar.getTime();
@@ -378,7 +381,7 @@ public class ScreenTimeUsage {
                 SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
                 Date recordDate = format.parse(record.getDate());
                 if (recordDate != null && recordDate.after(cutoffDate)) {
-                    totalUsageForPeriod += record.getUsageMinutes();
+                    totalUsageForPeriod += record.getUsageMilliseconds();
                 }
             } catch (Exception e) {
                 Log.e(TAG,"An unexpected error occurred during calculation of usage for period.");

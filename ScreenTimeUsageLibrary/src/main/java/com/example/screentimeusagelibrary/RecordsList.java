@@ -91,7 +91,7 @@ public class RecordsList {
     public String toString() {
         return "RecordsList{" +
                 "listName='" + listName + '\'' +
-                ", recordsArrayList=" + recordsArrayList +
+                ", records=" + recordsArrayList +
                 '}';
     }
 }
