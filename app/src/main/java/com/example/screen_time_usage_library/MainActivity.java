@@ -27,36 +27,45 @@ public class MainActivity extends MonitoredActivity {
         setContentView(R.layout.activity_main);
 
         findViews();
-        button.setOnClickListener(v -> {
-            Toast.makeText(this,"This is a toast!",Toast.LENGTH_SHORT).show();
-            editTextText.clearFocus();
-        });
 
-        long lastUseTimestamp = getScreenTimeUsage().getDailyUsage();
+        if(getScreenTimeUsage().isDismissOrExitPressed())
+        {
+            main_LBL_last_time.setText("TIME ENDS!");
+            button.setEnabled(false);
+            editTextText.setEnabled(false);
+        }
+        else {
+            button.setOnClickListener(v -> {
+                Toast.makeText(this, "This is a toast!", Toast.LENGTH_SHORT).show();
+                editTextText.clearFocus();
+            });
 
-        String str = "Your daily usage\n  " + formatTime(lastUseTimestamp);
-        main_LBL_last_time.setText(str);
+            long lastUseTimestamp = getScreenTimeUsage().getDailyUsage();
 
-        getScreenTimeUsage().setDialogTimeLimitTitle("Your time is up!!").
-                setDialogTimeLimitBody("Your time up.\nPlease try again later.")
-                .setTimeLimit(minutes*60*1000)
-                .setExtraTime(2*60*1000); // extra 2 minutes
+            String str = "Your daily usage\n  " + formatTime(lastUseTimestamp);
+            main_LBL_last_time.setText(str);
 
-        getScreenTimeUsage().setTimeLimitCallback(new TimeLimitCallback() {
-            @Override
-            public void onTimeEnds(long milliseconds)  {
-                String strTimeEnds = "TIME ENDS! "+formatTime(milliseconds)+"\nPlease come back tomorrow.";
-                main_LBL_last_time.setText(strTimeEnds);
-                button.setEnabled(false);
-                editTextText.setEnabled(false);
-            }
+            getScreenTimeUsage().setDialogTimeLimitTitle("Your time is up!!").
+                    setDialogTimeLimitBody("Your time up.\nPlease try again later.")
+                    .setTimeLimit(minutes * 60 * 1000)
+                    .setExtraTime(2 * 60 * 1000); // extra 2 minutes
 
-            @Override
-            public void onUsageTimeUpdated(long milliseconds) {
-                String str = "updated usage - tap to refresh\n" + formatTime(milliseconds);
-                main_LBL_last_time.setText(str);
-            }
-        });
+            getScreenTimeUsage().setTimeLimitCallback(new TimeLimitCallback() {
+                @Override
+                public void onTimeEnds(long milliseconds) {
+                    String strTimeEnds = "TIME ENDS! " + formatTime(milliseconds) + "\nPlease come back tomorrow.";
+                    main_LBL_last_time.setText(strTimeEnds);
+                    button.setEnabled(false);
+                    editTextText.setEnabled(false);
+                }
+
+                @Override
+                public void onUsageTimeUpdated(long milliseconds) {
+                    String str = "updated usage - tap to refresh\n" + formatTime(milliseconds);
+                    main_LBL_last_time.setText(str);
+                }
+            });
+        }
 
         Log.d("TEST - daily","daily " + getScreenTimeUsage().getDailyUsage());
         Log.d("TEST - weekly","weekly " + getScreenTimeUsage().getWeeklyUsage());

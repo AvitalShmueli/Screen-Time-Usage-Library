@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class ScreenTimeUsage {
+    private static ScreenTimeUsage instance = null;
     private long timeout, timeLimit, extraTime;
-    private final Context context;
     private Handler mHandlerTimeLimit, mHandlerTimeout;
     private Runnable mRunnableTimeLimit, mRunnableTimeout;
     private MaterialTextView dialog_LBL_title;
@@ -43,12 +43,31 @@ public class ScreenTimeUsage {
     private boolean isDismissOrExitPressed;
     private final View dialogView;
 
-    public ScreenTimeUsage(Context context){
-        this(context,5000,2000);
+
+    public static void init(Context context, long timeLimit_milliseconds, long timeout_milliseconds){
+        synchronized (SharedPreferencesManager.class) {
+            if (instance == null) {
+                instance = new ScreenTimeUsage(context,timeLimit_milliseconds,timeout_milliseconds);
+            }
+        }
     }
 
-    public ScreenTimeUsage(Context context, long timeLimit_milliseconds, long timeout_milliseconds){
-        this.context = context;
+
+    public static void init(Context context){
+        synchronized (SharedPreferencesManager.class) {
+            if (instance == null) {
+                instance = new ScreenTimeUsage(context,5000,2000);
+            }
+        }
+    }
+
+
+    public static ScreenTimeUsage getInstance() {
+        return instance;
+    }
+
+
+    private ScreenTimeUsage(Context context, long timeLimit_milliseconds, long timeout_milliseconds){
         timeLimit = timeLimit_milliseconds;
         timeout = timeout_milliseconds;
         isDialogVisible = false;
@@ -68,7 +87,7 @@ public class ScreenTimeUsage {
         today = dateFormat.format(todayDate);
 
         loadDataFromSP();
-        initView(dialogView);
+        initView(context, dialogView);
     }
 
 
@@ -101,7 +120,7 @@ public class ScreenTimeUsage {
     }
 
 
-    private void initView(View view){
+    private void initView(Context context, View view){
         dialogTimeLimitTitle = "Your time is up!!";
         dialogTimeLimitBody = "Your " + timeLimit/(60*1000) + " minutes of using the app are over.";
         dialogTimeLimitBtnDismiss = "Dismiss";
@@ -113,7 +132,7 @@ public class ScreenTimeUsage {
         dialogTimeoutBtnMoreTime = "Yes";
 
         if (totalMilliseconds >= timeLimit && !isDialogVisible)
-            showTimeLimitDialog(dialogView);
+            showTimeLimitDialog(context, dialogView);
 
         else{
             timeLimit -= totalMilliseconds;
@@ -121,17 +140,17 @@ public class ScreenTimeUsage {
         }
 
         mHandlerTimeLimit = new Handler(Looper.getMainLooper());
-        mRunnableTimeLimit = () -> showTimeLimitDialog(view);
+        mRunnableTimeLimit = () -> showTimeLimitDialog(context, view);
         startHandlerTimeLimit();
 
         mHandlerTimeout = new Handler(Looper.getMainLooper());
-        mRunnableTimeout = () -> {showTimeoutDialog(view);};
+        mRunnableTimeout = () -> showTimeoutDialog(context, view);
         startHandlerTimeout();
 
     }
 
 
-    private void showTimeLimitDialog(View view) {
+    private void showTimeLimitDialog(Context context, View view) {
         if (!isDismissOrExitPressed) {
             if (isDialogVisible) {
                 stopHandlerTimeLimit();
@@ -150,7 +169,7 @@ public class ScreenTimeUsage {
                         public void onClick(DialogInterface dialog, int i) {
                             stopHandlerTimeLimit();
                             Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnMoreTime + "remain time (ms): " + timeLimit);
-                            updateUsageMinutes();
+                            updateUsageTime();
                             if (timeLimitCallback != null) {
                                 timeLimitCallback.onUsageTimeUpdated(totalMilliseconds);
                             }
@@ -164,13 +183,14 @@ public class ScreenTimeUsage {
                             stopHandlerTimeLimit();
                             stopHandlerTimeout();
                             Log.d("TEST", "Dialog time limit | " + dialogTimeLimitBtnDismiss);
-                            updateUsageMinutes();
+                            updateUsageTime();
                             if (timeLimitCallback != null)
                                 timeLimitCallback.onTimeEnds(totalMilliseconds);
                             isDismissOrExitPressed = true;
                             dialog.dismiss();
                         }
                     }).create();
+            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
             alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
             alertDialog.show();
@@ -178,7 +198,7 @@ public class ScreenTimeUsage {
     }
 
 
-    private void showTimeoutDialog(View view) {
+    private void showTimeoutDialog(Context context, View view) {
         if (!isDismissOrExitPressed) {
             if (isDialogVisible) {
                 stopHandlerTimeout();
@@ -197,7 +217,7 @@ public class ScreenTimeUsage {
                         public void onClick(DialogInterface dialog, int i) {
                             stopHandlerTimeout();
                             Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnMoreTime + "remain time (ms): " + timeLimit);
-                            updateUsageMinutes();
+                            updateUsageTime();
                             if (timeLimitCallback != null) {
                                 timeLimitCallback.onUsageTimeUpdated(totalMilliseconds);
                             }
@@ -210,14 +230,14 @@ public class ScreenTimeUsage {
                             stopHandlerTimeout();
                             stopHandlerTimeLimit();
                             Log.d("TEST", "Dialog timeout | " + dialogTimeoutBtnDismiss);
-                            updateUsageMinutes();
+                            updateUsageTime();
                             if (timeLimitCallback != null)
                                 timeLimitCallback.onTimeEnds(totalMilliseconds);
                             isDismissOrExitPressed = true;
                             dialog.dismiss();
                         }
                     }).create();
-
+            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.setOnShowListener(dialog -> isDialogVisible = true);// Set the flag to true when the dialog is shown
             alertDialog.setOnDismissListener(dialog -> isDialogVisible = false); // Reset the flag when the dialog is dismissed
             alertDialog.show();
@@ -245,13 +265,13 @@ public class ScreenTimeUsage {
     }
 
 
-    public void onUserInteractionDetected() {
+    public void onUserInteractionDetected(Context context) {
         stopHandlerTimeout();
         if(!isDismissOrExitPressed) {
             startHandlerTimeout();
-            updateUsageMinutes();
+            updateUsageTime();
             if(System.currentTimeMillis() - extraTime > initialTimestampMillis)
-                showTimeLimitDialog(dialogView);
+                showTimeLimitDialog(context, dialogView);
         }
     }
 
@@ -330,7 +350,7 @@ public class ScreenTimeUsage {
     }
 
 
-    public void updateUsageMinutes(){
+    public void updateUsageTime(){
         long currentTimestamp = System.currentTimeMillis();
         long delta = currentTimestamp - initialTimestampMillis;
         initialTimestampMillis = currentTimestamp;
@@ -388,6 +408,11 @@ public class ScreenTimeUsage {
             }
         }
         return totalUsageForPeriod;
+    }
+
+
+    public boolean isDismissOrExitPressed() {
+        return isDismissOrExitPressed;
     }
 
 }

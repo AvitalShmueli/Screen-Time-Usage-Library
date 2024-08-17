@@ -11,7 +11,6 @@ import java.util.Locale;
 
 public class MonitoredActivity extends AppCompatActivity {
 
-    private ScreenTimeUsage screenTimeUsage;
     private float timeLimitMinutes = -1, timeoutMinutes = -1;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,7 @@ public class MonitoredActivity extends AppCompatActivity {
             timeoutMinutes = 0.5F; // 30 seconds
         long timeout_milliseconds = (long) (timeoutMinutes * 60 * 1000);
 
-        screenTimeUsage = new ScreenTimeUsage(this, timeLimit_milliseconds, timeout_milliseconds);
+        ScreenTimeUsage.init(this, timeLimit_milliseconds, timeout_milliseconds);
 
     }
 
@@ -41,7 +40,7 @@ public class MonitoredActivity extends AppCompatActivity {
 
 
     public ScreenTimeUsage getScreenTimeUsage() {
-        return screenTimeUsage;
+        return ScreenTimeUsage.getInstance();
     }
 
 
@@ -49,7 +48,7 @@ public class MonitoredActivity extends AppCompatActivity {
     public void onUserInteraction() {
         long now = System.currentTimeMillis();
         Log.d("TEST - last interaction","last interaction: " + getDate(now));
-        screenTimeUsage.onUserInteractionDetected();
+        ScreenTimeUsage.getInstance().onUserInteractionDetected(this);
         super.onUserInteraction();
     }
 
@@ -64,7 +63,7 @@ public class MonitoredActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         Log.d("TEST","STOP");
-        screenTimeUsage.updateUsageMinutes();
+        ScreenTimeUsage.getInstance().updateUsageTime();
         super.onStop();
     }
 
@@ -72,8 +71,8 @@ public class MonitoredActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         Log.d("TEST","RESTART");
-        screenTimeUsage.setInitialTimestampMillis(System.currentTimeMillis());
-        screenTimeUsage.updateUsageMinutes();
+        ScreenTimeUsage.getInstance().setInitialTimestampMillis(System.currentTimeMillis());
+        ScreenTimeUsage.getInstance().updateUsageTime();
         super.onRestart();
     }
 }
