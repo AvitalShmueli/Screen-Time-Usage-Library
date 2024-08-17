@@ -12,31 +12,31 @@ import java.util.Locale;
 public class MonitoredActivity extends AppCompatActivity {
 
     private ScreenTimeUsage screenTimeUsage;
-    private float timeLimit_minutes = -1,timeout_minutes = -1;
+    private float timeLimitMinutes = -1, timeoutMinutes = -1;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(timeLimit_minutes == -1)
-            timeLimit_minutes = 2; // 2 minutes
-        long timeLimit_milliseconds = (long) (timeLimit_minutes * 60 * 1000);
+        if(timeLimitMinutes == -1)
+            timeLimitMinutes = 2; // 2 minutes
+        long timeLimit_milliseconds = (long) (timeLimitMinutes * 60 * 1000);
 
-        if(timeout_minutes == -1)
-            timeout_minutes = 0.5F; // 30 seconds
-        long timeout_milliseconds = (long) (timeout_minutes * 60 * 1000);
+        if(timeoutMinutes == -1)
+            timeoutMinutes = 0.5F; // 30 seconds
+        long timeout_milliseconds = (long) (timeoutMinutes * 60 * 1000);
 
         screenTimeUsage = new ScreenTimeUsage(this, timeLimit_milliseconds, timeout_milliseconds);
 
     }
 
 
-    public void setTimeLimit(float timeLimit_minutes) {
-        this.timeLimit_minutes = timeLimit_minutes;
+    public void setTimeLimit(float minutes) {
+        this.timeLimitMinutes = minutes;
     }
 
 
-    public void setTimeout(float timeout_minutes) {
-        this.timeout_minutes = timeout_minutes;
+    public void setTimeout(float minutes) {
+        this.timeoutMinutes = minutes;
     }
 
 
